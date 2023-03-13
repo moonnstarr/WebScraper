@@ -3,6 +3,7 @@ live/
 .idea/
 Template_Old.xlsx
 chromedriver.exe
+app.exe
 
 ### JetBrains template
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
