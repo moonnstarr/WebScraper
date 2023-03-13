@@ -12,17 +12,17 @@ print("============================================================")
 print("Input file loaded successfully!")
 
 main_df = pd.DataFrame(columns=['model',
-                                    'category',
+                                    # 'category',
                                     'grade',
-                                    'wesell',
+                                    # 'wesell',
                                     'webuy_cash',
-                                    'webuy_voucher',
+                                    # 'webuy_voucher',
                                     'low_margin %',
                                     'mid_margin %',
                                     'high_margin %'])
 
 for i, row in phone_list.iterrows():
-    website = f"https://uk.webuy.com/search?stext=+{row[0]}&Grade=C"
+    website = f"https://uk.webuy.com/search?stext=+{row[0]}&Grade={row[3]}"
 
     # Selenium and Chrome webscraping configs
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/110.0"
@@ -57,11 +57,11 @@ for i, row in phone_list.iterrows():
 
     # List to append the extracted data
     model = []
-    device = []
+    # device = []
     grade = []
-    wesell = []
+    # wesell = []
     webuy_cash = []
-    webuy_voucher = []
+    # webuy_voucher = []
     low_margin = []
     mid_margin = []
     high_margin = []
@@ -71,12 +71,13 @@ for i, row in phone_list.iterrows():
 
     # Looping through each phone search results to get the values
     for models in phone_models:
-        model.append(models.find_element(By.XPATH, ".//span[@class='ais-Highlight']").text)
-        device.append(models.find_element(By.XPATH, "./p").text)
-        grade.append('C')
-        wesell.append(models.find_element(By.XPATH, ".//div[starts-with(@class,'priceTxt') and starts-with(text(),'WeSell for')]").text)
+        name = models.find_element(By.XPATH, ".//span[@class='ais-Highlight']").text
+        model.append(name)
+        # device.append(models.find_element(By.XPATH, "./p").text)
+        grade.append(str(name)[-1])
+        # wesell.append(models.find_element(By.XPATH, ".//div[starts-with(@class,'priceTxt') and starts-with(text(),'WeSell for')]").text)
         webuy_cash.append(models.find_element(By.XPATH, ".//div[starts-with(@class,'priceTxt') and starts-with(text(),'WeBuy for cash')]").text)
-        webuy_voucher.append(models.find_element(By.XPATH, ".//div[starts-with(@class,'priceTxt') and starts-with(text(),'WeBuy for voucher')]").text)
+        # webuy_voucher.append(models.find_element(By.XPATH, ".//div[starts-with(@class,'priceTxt') and starts-with(text(),'WeBuy for voucher')]").text)
         low_margin.append(0.20)
         mid_margin.append(0.25)
         high_margin.append(0.30)
@@ -86,11 +87,11 @@ for i, row in phone_list.iterrows():
 
     # Rearranging the data into a data frame
     df = pd.DataFrame({'model': model,
-                       'category': device,
+                       # 'category': device,
                        'grade': grade,
-                       'wesell': wesell,
+                       # 'wesell': wesell,
                        'webuy_cash': webuy_cash,
-                       'webuy_voucher': webuy_voucher,
+                       # 'webuy_voucher': webuy_voucher,
                        'low_margin %': low_margin,
                        'mid_margin %': mid_margin,
                        'high_margin %': high_margin})
@@ -103,9 +104,9 @@ for i, row in phone_list.iterrows():
 final_df = pd.concat([phone_list, main_df], axis=1)
 
 # Converting text into numbers and calculations
-final_df['wesell'] = final_df['wesell'].str.replace('WeSell for £', '').astype(float)
+# final_df['wesell'] = final_df['wesell'].str.replace('WeSell for £', '').astype(float)
 final_df['webuy_cash'] = final_df['webuy_cash'].str.replace('WeBuy for cash £', '').astype(float)
-final_df['webuy_voucher'] = final_df['webuy_voucher'].str.replace('WeBuy for voucher £', '').astype(float)
+# final_df['webuy_voucher'] = final_df['webuy_voucher'].str.replace('WeBuy for voucher £', '').astype(float)
 final_df['low_margin_cost'] = final_df['webuy_cash'] * 0.80
 final_df['mid_margin_cost'] = final_df['webuy_cash'] * 0.75
 final_df['high_margin_cost'] = final_df['webuy_cash'] * 0.70
@@ -118,8 +119,27 @@ print("Data rearranged to export")
 
 # Rename columns
 final_df = final_df.rename(columns={'Name': 'Supplier_Name',
+                                    'Grade': 'Supplier_Grade',
                                     'Qty': 'Supplier_Qty',
                                     'Cost': 'Supplier_Cost'})
+
+final_df = final_df[[
+            'Supplier_Name',
+            'Capacity',
+            'Color',
+            'Supplier_Grade',
+            'Supplier_Qty',
+            'Supplier_Cost',
+            'model',
+            'grade',
+            'webuy_cash',
+            'low_margin %',
+            'low_margin_cost',
+            'mid_margin %',
+            'mid_margin_cost',
+            'high_margin %',
+            'high_margin_cost'
+    ]]
 
 
 def save_to_excel():
