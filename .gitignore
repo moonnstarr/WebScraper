@@ -1,6 +1,9 @@
 #Project files
 live/
 .idea/
+dist/
+build/
+
 Template_Old.xlsx
 chromedriver.exe
 app.exe
