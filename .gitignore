@@ -3,6 +3,7 @@ live/
 .idea/
 dist/
 build/
+prod/
 
 Template_Old.xlsx
 chromedriver.exe
