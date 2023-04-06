@@ -59,11 +59,8 @@ for i, row in phone_list.iterrows():
 
     # List to append the extracted data
     model = []
-    # device = []
     grade = []
-    # wesell = []
     webuy_cash = []
-    # webuy_voucher = []
     low_margin = []
     mid_margin = []
     high_margin = []
@@ -73,27 +70,45 @@ for i, row in phone_list.iterrows():
 
     # Looping through each phone search results to get the values
     for models in phone_models:
-        name = models.find_element(By.XPATH, ".//span[@class='ais-Highlight']").text
-        model.append(name)
-        # device.append(models.find_element(By.XPATH, "./p").text)
-        grade.append(str(name)[-1])
-        # wesell.append(models.find_element(By.XPATH, ".//div[starts-with(@class,'priceTxt') and starts-with(text(),'WeSell for')]").text)
-        webuy_cash.append(models.find_element(By.XPATH, ".//div[starts-with(@class,'priceTxt') and starts-with(text(),'WeBuy for cash')]").text)
-        # webuy_voucher.append(models.find_element(By.XPATH, ".//div[starts-with(@class,'priceTxt') and starts-with(text(),'WeBuy for voucher')]").text)
-        low_margin.append(0.20)
-        mid_margin.append(0.25)
-        high_margin.append(0.30)
+        try:
+            name = models.find_element(By.XPATH, ".//span[@class='ais-Highlight']").text
+            if name != "":
+                model.append(name)
+                grade.append(str(name)[-1])
+                webuy_cash.append(models.find_element(By.XPATH, ".//div[starts-with(@class,'priceTxt') and starts-with(text(),'WeBuy for cash')]").text)
+                low_margin.append(0.20)
+                mid_margin.append(0.25)
+                high_margin.append(0.30)
+            else:
+                def null_data():
+                    print("============================")
+                    print(f"Data extraction unsuccessful for {row[0]} {row[1]}")
+                    print("============================")
+                    model.append("N/A")
+                    grade.append("N/A")
+                    webuy_cash.append("N/A")
+                    low_margin.append(0.20)
+                    mid_margin.append(0.25)
+                    high_margin.append(0.30)
+        except:
+            print("============================")
+            print(f"Data extraction unsuccessful for {row[0]} {row[1]}")
+            print("============================")
+            model.append("N/A")
+            grade.append("N/A")
+            webuy_cash.append("N/A")
+            low_margin.append(0.20)
+            mid_margin.append(0.25)
+            high_margin.append(0.30)
 
-    print("============================================================")
+    print("============================")
     print("Data retrieve in-progres...")
+    print("============================")
 
     # Rearranging the data into a data frame
     df = pd.DataFrame({'model': model,
-                       # 'category': device,
                        'grade': grade,
-                       # 'wesell': wesell,
                        'webuy_cash': webuy_cash,
-                       # 'webuy_voucher': webuy_voucher,
                        'low_margin %': low_margin,
                        'mid_margin %': mid_margin,
                        'high_margin %': high_margin})
@@ -106,9 +121,7 @@ for i, row in phone_list.iterrows():
 final_df = pd.concat([phone_list, main_df], axis=1)
 
 # Converting text into numbers and calculations
-# final_df['wesell'] = final_df['wesell'].str.replace('WeSell for £', '').astype(float)
 final_df['webuy_cash'] = final_df['webuy_cash'].str.replace('WeBuy for cash £', '').astype(float)
-# final_df['webuy_voucher'] = final_df['webuy_voucher'].str.replace('WeBuy for voucher £', '').astype(float)
 final_df['low_margin_cost'] = final_df['webuy_cash'] * 0.80
 final_df['mid_margin_cost'] = final_df['webuy_cash'] * 0.75
 final_df['high_margin_cost'] = final_df['webuy_cash'] * 0.70
